@@ -1,0 +1,62 @@
+1. Create web.config for React Router
+Place this file in your build output folder (dist or build) before deploying:
+
+2. Build Your Project
+Output will be in dist or build folder.
+Copy web.config into this folder.
+3. Manage .env Variables
+Do NOT include .env in your build or upload. Instead, set these variables in Azure Portal:
+
+Go to your Web App in Azure Portal.
+Click Configuration (under Settings).
+Under Application settings, click New application setting for each variable in your .env file (e.g., VITE_AZURE_CLIENT_ID, etc.).
+Save and restart your Web App.
+4. Deployment Options
+Option A: ZIP Deploy (Manual)
+Zip your build output
+
+Compress the contents of dist or build (including web.config) into a .zip file.
+Upload via Azure Portal
+
+Go to your Web App > Deployment Center > ZIP Deploy.
+Upload your .zip file.
+Restart your Web App
+
+Go to Overview > Restart.
+Option B: FTP Deploy
+Get FTP Credentials
+
+In Azure Portal, go to your Web App > Deployment Center > FTP.
+Copy the FTP hostname, username, and password.
+Upload Files
+
+Use an FTP client (e.g., FileZilla).
+Connect and upload the contents of your build folder (including web.config) to /site/wwwroot.
+Restart your Web App
+
+In Azure Portal, click Restart.
+Option C: GitHub Actions (CI/CD)
+Push your code to GitHub.
+
+In Azure Portal:
+
+Go to your Web App > Deployment Center > GitHub.
+Authorize and select your repo and branch.
+Azure will create a workflow file in your repo (e.g., .github/workflows/azure.yml).
+
+Configure build steps in the workflow file if needed:
+
+Ensure it runs npm install and npm run build.
+Add a step to copy web.config to the build output.
+On push, GitHub Actions will build and deploy automatically.
+
+5. Verify Deployment
+Visit https://<your-app-name>.azurewebsites.net
+Test navigation (React Router should work).
+Check environment variables are loaded (test authentication/API calls).
+Summary
+Build your project and add web.config for React Router.
+Set .env variables in Azure Portal, not in your code.
+Deploy using ZIP, FTP, or GitHub Actions.
+Restart and verify your app.
+Let me know if you need a sample GitHub Actions workflow or help with a specific deployment method!
