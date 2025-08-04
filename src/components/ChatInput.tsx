@@ -155,7 +155,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ placeholder = "Ask your question.
         // If there's no active session, create a new one. This applies to both regular chat and image generation.
         if (!currentSessionId) {
           console.log("ChatInput - handleSend: activeChatId is null, creating new chat session...");
-          const regResponse = await apiClient.post('http://localhost:8000/jasp-api/chat/session/register', {
+          const regResponse = await apiClient.post('https://jaspgptdev.azurewebsites.net/jasp-api/chat/session/register', {
             title: message.substring(0, 50) || "New Chat",
             user_id: userProfile.id
           });
@@ -199,7 +199,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ placeholder = "Ask your question.
           console.log("ChatInput - handleSend: Calling interact-with-agent API.");
           const historyForBackend = formatHistory(currentChat);
 
-          const agentResponse = await apiClient.post('http://localhost:8000/jasp-api/chat/interact-with-agent', {
+          const agentResponse = await apiClient.post('https://jaspgptdev.azurewebsites.net/jasp-api/chat/interact-with-agent', {
             user_id: userProfile.id,
             session_id: currentSessionId,
             user_input: message,
