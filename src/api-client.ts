@@ -4,7 +4,7 @@ import { getAccessToken } from './auth-utils'; // Import the getAccessToken func
 
 
 const apiClient = axios.create({
-    baseURL: "http://127.0.0.1:8000/jasp-api", // Replace with your actual API base URL
+    baseURL: "https://jaspgptdev.azurewebsites.net/jasp-api", // Replace with your actual API base URL
     headers: {
         'Content-Type': 'application/json',
     },

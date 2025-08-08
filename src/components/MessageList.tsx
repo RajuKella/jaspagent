@@ -44,7 +44,7 @@ const MessageList: React.FC = () => {
       }
 
       try {
-        const baseUrl = "http://localhost:8000/jasp-api/docs";
+        const baseUrl = "https://jaspgptdev.azurewebsites.net/jasp-api/docs";
         const url = `${baseUrl}/citation-doc/${citation.doc_id}`;
 
         const params: { user_id: number; page?: number } = {
