@@ -88,3 +88,26 @@ export const generateImages = async (
         }
     }
 };
+
+
+/**
+ * Deletes a chat session for a user.
+ * @param sessionId - The ID of the chat session to delete.
+ * @param userId - The ID of the user.
+ */
+export const deleteChatSessionApi = async (sessionId: string) => {
+    try {
+        const response = await apiClient.delete(`chat/${sessionId}/delete`, {
+        });
+        return response.data;
+    } catch (error: any) {
+        if (axios.isAxiosError(error) && error.response) {
+            const errorData = error.response.data;
+            throw new Error(errorData.detail || `HTTP Error! Status: ${error.response.status}`);
+        } else if (axios.isAxiosError(error) && error.request) {
+            throw new Error("No response from the server. Please check your network connection.");
+        } else {
+            throw new Error(`Error: ${error.message}`);
+        }
+    }
+};

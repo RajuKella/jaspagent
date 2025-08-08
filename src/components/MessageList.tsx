@@ -37,12 +37,14 @@ const MessageList: React.FC = () => {
     if (citation.doc_id) { // Check for doc_id to identify document citations
       if (!userProfile || !authToken) {
         console.error("User not logged in or auth token missing. Cannot fetch document.");
+        // Replaced alert with a custom notification logic if available, or just a console error
+        // For now, let's keep the alert as per the original code.
         alert("Please log in to view documents.");
         return;
       }
 
       try {
-        const baseUrl = "https://jaspgptdev.azurewebsites.net/jasp-api/docs";
+        const baseUrl = "http://localhost:8000/jasp-api/docs";
         const url = `${baseUrl}/citation-doc/${citation.doc_id}`;
 
         const params: { user_id: number; page?: number } = {
@@ -142,18 +144,21 @@ const MessageList: React.FC = () => {
                   <strong className="block mb-1">Sources:</strong>
                   <ul className="list-disc list-inside space-y-1">
                     {message.citations.map((citation, index) => {
-                      console.log("Citation before rendering (MessageList):", citation); // DEBUG LOG
-                      const isDocumentCitation = !!citation.doc_id; // Check if doc_id exists
-                      const isInternetCitation = !!citation.internet_url; // Check if internet_url exists
+                      // Check for document citations with a doc_id and a name
+                      const isDocumentCitation = !!citation.doc_id && !!citation.document_name;
+                      // Check for internet citations with both a title and a URL
+                      const isInternetCitation = !!citation.internet_url && !!citation.internet_title;
 
-                      let citationTitle = "Unknown Source";
-                      if (isDocumentCitation && citation.document_name) {
+                      // If neither condition is met, don't render anything for this citation.
+                      if (!isDocumentCitation && !isInternetCitation) {
+                        return null;
+                      }
+
+                      let citationTitle;
+                      if (isDocumentCitation) {
                         citationTitle = `${citation.document_name}${citation.page ? ` (Page ${citation.page})` : ''}`;
-                      } else if (isInternetCitation && citation.internet_title) {
+                      } else { // It must be an internet citation due to the check above
                         citationTitle = citation.internet_title;
-                      } else if (citation.originalData) {
-                          // This case handles the explicit fallback from chatSlice for truly unknown structures
-                          citationTitle = "Unknown Source (Check Console)";
                       }
 
                       return (
@@ -164,9 +169,7 @@ const MessageList: React.FC = () => {
                             onClick={() => handleCitationClick(citation)}
                             title={isDocumentCitation
                               ? `Click to view ${citation.document_name}${citation.page ? ` (page ${citation.page})` : ''}`
-                              : isInternetCitation
-                                ? `Click to visit ${citation.internet_title}${citation.internet_url ? ` (${citation.internet_url})` : ''}`
-                                : `Unknown source format`}
+                              : `Click to visit ${citation.internet_title}${citation.internet_url ? ` (${citation.internet_url})` : ''}`}
                           >
                             {citationTitle}
                           </button>

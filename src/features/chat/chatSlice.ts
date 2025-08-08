@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction , createAsyncThunk } from "@reduxjs/toolkit";
-import { fetchChatHistoryApi, fetchChatConversationApi } from "./chatApi";
+import { fetchChatHistoryApi, fetchChatConversationApi, deleteChatSessionApi } from "./chatApi";
 
 export interface ChatHistory {
     chatTitle: string;
@@ -57,6 +57,18 @@ export const fetchChatHistory = createAsyncThunk(
         }));
 
         return formattedHistory;
+    }
+);
+
+export const deleteChatSession = createAsyncThunk(
+    "chat/deleteSession",
+    async ({ chatId }: { chatId: string; }, { rejectWithValue }) => {
+        try {
+            await deleteChatSessionApi(chatId);
+            return chatId; // Return the ID of the deleted chat
+        } catch (error: any) {
+            return rejectWithValue(error.message);
+        }
     }
 );
 
@@ -145,6 +157,22 @@ const chatSlice = createSlice({
             .addCase(fetchChatConversation.rejected, (state, action) => {
                 state.status = "failed";
                 state.error = action.payload as string || "Failed to fetch conversation";
+            })
+            .addCase(deleteChatSession.fulfilled, (state, action: PayloadAction<string>) => {
+                const deletedChatId = action.payload;
+                // Remove the deleted chat from the chatHistory array
+                state.chatHistory = state.chatHistory.filter(
+                    (chat) => chat.chatId !== deletedChatId
+                );
+
+                // If the deleted chat was the active one, clear the active chat state
+                if (state.activeChatId === deletedChatId) {
+                    state.activeChatId = null;
+                    state.currentChat = [];
+                }
+            })
+            .addCase(deleteChatSession.rejected, (state, action) => {
+                state.error = action.payload as string || "Failed to delete chat session";
             });
     },
 });

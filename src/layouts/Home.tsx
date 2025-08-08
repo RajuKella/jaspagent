@@ -1,5 +1,5 @@
 // Home.tsx
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import { useMsal } from "@azure/msal-react";
 // Remove loginRequest import, it's now in useLogout
@@ -21,6 +21,7 @@ import {
     setActiveChat,
     clearCurrentChat,
     fetchChatConversation,
+    deleteChatSession
 } from "../features/chat/chatSlice";
 import { selectActiveChatId, selectChatHistory, selectCurrentChat } from "../features/chat/chatSelectors";
 import {
@@ -40,6 +41,17 @@ const Home: React.FC = () => {
 
   const userProfile = useAppSelector(selectUserProfile);
   const activeChatId = useAppSelector(selectActiveChatId);
+  const [notification, setNotification] = useState<{ message: string | null; type: 'success' | 'error' | null }>({ message: null, type: null });
+  const [deletingChatId, setDeletingChatId] = useState<string | null>(null);
+
+  useEffect(() => {
+      if (notification.message) {
+          const timer = setTimeout(() => {
+              setNotification({ message: null, type: null });
+          }, 3000); // Message disappears after 3 seconds
+          return () => clearTimeout(timer);
+      }
+    }, [notification]);
 
 
   useEffect(() => {
@@ -102,6 +114,20 @@ const Home: React.FC = () => {
   }, [accounts, instance, isAuthenticated, dispatch]);
 
 
+  const handleChatDelete = async (chatId: string) => {
+      setDeletingChatId(chatId); // Set the chat ID to show the loader
+      try {
+          await dispatch(deleteChatSession({
+              chatId: chatId,
+          })).unwrap();
+          setNotification({ message: "Chat deleted successfully! 👍", type: 'success' });
+      } catch (error) {
+          setNotification({ message: `Failed to delete chat: ${error}`, type: 'error' });
+      } finally {
+          setDeletingChatId(null); // Clear the loading state
+      }
+    };
+
   const handleChatSelect = (chatId: string | null) => {
     dispatch(setActiveChat(chatId));
     dispatch(clearCurrentChat());
@@ -121,6 +147,8 @@ const Home: React.FC = () => {
           chats={chatHistory}
           activeChatId={activeChatId}
           onChatSelect={handleChatSelect}
+          onChatDelete={handleChatDelete}
+          deletingChatId={deletingChatId}
         />
       )}
       <main className="flex-grow flex flex-col h-screen">

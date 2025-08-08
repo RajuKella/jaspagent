@@ -1,62 +1,111 @@
-1. Create web.config for React Router
-Place this file in your build output folder (dist or build) before deploying:
+Deploying Your React App to Azure Static Web Apps from VS Code
+This guide will walk you through the entire process of creating an Azure Static Web App and deploying your local React project directly from Visual Studio Code.
 
-2. Build Your Project
-Output will be in dist or build folder.
-Copy web.config into this folder.
-3. Manage .env Variables
-Do NOT include .env in your build or upload. Instead, set these variables in Azure Portal:
+Step 1: Create the Static Web App Resource in the Azure Portal
+First, we need to create the service in Azure that will host your application.
 
-Go to your Web App in Azure Portal.
-Click Configuration (under Settings).
-Under Application settings, click New application setting for each variable in your .env file (e.g., VITE_AZURE_CLIENT_ID, etc.).
-Save and restart your Web App.
-4. Deployment Options
-Option A: ZIP Deploy (Manual)
-Zip your build output
+Sign In to Azure: Open your web browser and navigate to the Azure Portal. Log in with your account credentials.
 
-Compress the contents of dist or build (including web.config) into a .zip file.
-Upload via Azure Portal
+Search for Static Web Apps: In the main search bar at the top of the portal, type Static Web Apps and select it from the list of services.
 
-Go to your Web App > Deployment Center > ZIP Deploy.
-Upload your .zip file.
-Restart your Web App
+Create a New App: On the Static Web Apps page, click the + Create or Create Static Web App button.
 
-Go to Overview > Restart.
-Option B: FTP Deploy
-Get FTP Credentials
+Fill in the Project Details:
 
-In Azure Portal, go to your Web App > Deployment Center > FTP.
-Copy the FTP hostname, username, and password.
-Upload Files
+Subscription: Choose your Azure subscription.
 
-Use an FTP client (e.g., FileZilla).
-Connect and upload the contents of your build folder (including web.config) to /site/wwwroot.
-Restart your Web App
+Resource Group: A resource group is a container for your resources. You can select an existing one or click Create new to make a new one (e.g., MyReactApp-Resources).
 
-In Azure Portal, click Restart.
-Option C: GitHub Actions (CI/CD)
-Push your code to GitHub.
+Name: Give your application a unique name (e.g., my-cool-react-app). This will be part of your app's URL.
 
-In Azure Portal:
+Plan type: Select Standard. If you have a free account option, you can choose that as well.
 
-Go to your Web App > Deployment Center > GitHub.
-Authorize and select your repo and branch.
-Azure will create a workflow file in your repo (e.g., .github/workflows/azure.yml).
+Region: Choose a region closest to your users for best performance (e.g., East US 2).
 
-Configure build steps in the workflow file if needed:
+Set the Deployment Source:
 
-Ensure it runs npm install and npm run build.
-Add a step to copy web.config to the build output.
-On push, GitHub Actions will build and deploy automatically.
+For the "Deployment details" source, select Other. This indicates you will be deploying from a tool like VS Code instead of a Git repository.
 
-5. Verify Deployment
-Visit https://<your-app-name>.azurewebsites.net
-Test navigation (React Router should work).
-Check environment variables are loaded (test authentication/API calls).
-Summary
-Build your project and add web.config for React Router.
-Set .env variables in Azure Portal, not in your code.
-Deploy using ZIP, FTP, or GitHub Actions.
-Restart and verify your app.
-Let me know if you need a sample GitHub Actions workflow or help with a specific deployment method!
+Review and Create: Click the Review + create button. Azure will validate your settings. Once validation passes, click the Create button. Wait for the deployment of the resource to complete.
+
+Step 2: Prepare Visual Studio Code for Deployment
+Now, let's set up VS Code with the necessary tools to communicate with Azure.
+
+Install the Azure Tools Extension:
+
+Open VS Code.
+
+Go to the Extensions view by clicking the icon in the left-hand sidebar or by pressing Ctrl+Shift+X.
+
+In the search bar, type Azure Tools and press Enter.
+
+Find the extension pack named Azure Tools by Microsoft and click Install. This pack includes the Azure Static Web Apps extension, which is what we need.
+
+Sign In to Your Azure Account:
+
+Once the extension is installed, an Azure icon will appear in your Activity Bar (the far-left sidebar). Click on it.
+
+In the Azure explorer pane, you will see a Sign in to Azure... link. Click it and follow the prompts. A browser window will open for you to authenticate.
+
+After signing in, you should see your Azure subscription(s) listed in the VS Code Azure explorer.
+
+Step 3: Deploy Your React Application from VS Code
+This is where you'll push your code to the cloud.
+
+Open Your Project: Make sure your React application's root folder is open in VS Code.
+
+Navigate to the Azure Explorer: Click the Azure icon in the Activity Bar.
+
+Find the Static Web Apps Section: In the Azure explorer, you'll see a section for Static Web Apps. Expand it to see the Static Web App you created in Step 1.
+
+Initiate Deployment:
+
+Hover your mouse over your Static Web App's name. You will see several icons appear. Click the Deploy icon (it looks like an upward-pointing arrow).
+
+Alternatively, you can open the VS Code Command Palette (Ctrl+Shift+P), type Azure Static Web Apps: Deploy to Static Web App..., and press Enter.
+
+Follow the Deployment Prompts: VS Code will now ask you for details about your project.
+
+Select your subscription: A dropdown will appear. Choose the Azure subscription you used to create the app.
+
+Select your Static Web App: Choose the name of the Static Web App you created earlier.
+
+Enter the path of the application code: This is the location of your React code. Since you have the project root open, you can typically just press Enter to accept the default (/).
+
+Enter the path of the build output: This is crucial. For a standard Create React App project, the production-ready files are placed in a folder named build. So, type build and press Enter.
+
+Wait for the Deployment:
+
+An output terminal will appear in VS Code, showing you the progress. The extension will first run the npm run build command to build your React app and then deploy the contents of the build folder to Azure.
+
+This might take a few minutes. Once it's complete, you'll see a success message.
+
+Step 4: Configure Environment Variables
+Your .env files are not uploaded during deployment for security reasons. You must add them to the Azure configuration manually.
+
+Go Back to the Azure Portal: Navigate to your Static Web App resource in the Azure Portal.
+
+Find Configuration: In the left-hand menu for your app, click on Configuration.
+
+Add Application Settings:
+
+This section is for your environment variables.
+
+For each variable in your .env file (e.g., REACT_APP_API_KEY), click the + Add button.
+
+In the "Name" field, enter the variable name (e.g., REACT_APP_API_KEY).
+
+In the "Value" field, enter the corresponding value.
+
+Click OK to add the setting.
+
+Repeat this for all your environment variables.
+
+Save Your Changes: After adding all your variables, click the Save button at the top of the Configuration page. The app will restart with the new settings.
+
+Step 5: Visit Your Live Website!
+In the Azure Portal, go to the Overview page for your Static Web App. You will see a URL field. Click on the URL to see your deployed React application live!
+
+You can also find the URL in VS Code. In the Azure explorer, right-click on your Static Web App and select Browse Site.
+
+That's it! You have successfully deployed your React app to Azure Static Web Apps directly from your local VS Code environment.
